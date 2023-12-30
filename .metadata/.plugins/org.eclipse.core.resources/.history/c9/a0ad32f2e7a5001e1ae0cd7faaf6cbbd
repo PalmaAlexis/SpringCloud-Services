@@ -1,0 +1,61 @@
+package com.proyectspringoauth.services;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import com.proyectspringoauth.client.UserClientFeign;
+import com.usercommons.model.entity.User;
+
+import brave.Tracer;
+import feign.FeignException;
+
+@Service
+public class UserService implements UserDetailsService, IUserService {
+
+	private final Logger logg = LoggerFactory.getLogger(UserService.class);
+
+	@Autowired
+	private UserClientFeign userClient;
+	
+	@Autowired
+	private Tracer trace;
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+		try {
+			User user = userClient.findByUsername(username);
+			user.getAttempts();
+
+			List<GrantedAuthority> authorities = user.getRoles().stream()
+					.map(r -> new SimpleGrantedAuthority(r.getName()))
+					.peek(a -> logg.info("Rol authority created: " + a)).collect(Collectors.toList());
+
+			return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+					user.getEnable(), true, true, true, authorities);
+		} catch (FeignException e) {
+			logg.error("Username '" + username + "' doesn't exist");
+			trace.currentSpan().tag("error-mensaje", "Username '" + username + "' doesn't exist");
+			throw new UsernameNotFoundException("Username '" + username + "' doesn't exist");
+		}
+	}
+
+	@Override
+	public User findByUsername(String username) {
+		return userClient.findByUsername(username);
+	}
+
+	@Override
+	public User updateUserInfo(User u, Long id) {
+		return userClient.updateUserInfo(u, id);
+	}
+}

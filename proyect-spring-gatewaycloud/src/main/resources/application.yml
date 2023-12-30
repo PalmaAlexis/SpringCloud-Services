@@ -1,0 +1,71 @@
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 6
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 6
+        slow-call-duration-threshold: 2s
+        slow-call-rate-threshold: 50
+    instances:
+      products:
+        base-config: default
+  timelimiter:
+    configs:
+      default: 
+        timeout-duration: 1s
+    instances:
+      products:
+        base-config: default
+
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: app-product
+        uri: lb://app-product
+        predicates:  #AQUI SE ESTABLECEN LAS REGLAS QUE PONEMOS, del request
+        - Path=/api/product/**
+        #- Header= token, \d+ #CUALQUIER DIGITO
+        #- Method=GET, POST
+        #- Query=color
+        #- Cookie= color, azul
+        #- Header= Content-Type, application/json
+        filters:
+        - name: CircuitBreaker
+          args:
+            name: products
+            statusCodes: 500 #para que haga circuitBreaker con estos codigos, de lo contrario no hace con los demas
+            fallbackUri: forward:/api/item/id/1/quantity/1
+        - StripPrefix=2
+        - EjemploCookie1=Hola mi mensaje personalizado!, Usuario, AlexisPalma
+          #name:
+          #args: 
+          #    message: 
+          #    tokenNombre: 
+          #    tokenValor: 
+      - id: app-item
+        uri: lb://app-item
+        predicates:
+        - Path=/api/item/**
+        filters:
+        - StripPrefix=2
+        - AddRequestHeader=token-request, 123456
+        - AddResponseHeader=token-response, 12345678
+        - AddRequestParameter= nombre, Alexis
+      - id: app-oauth
+        uri: lb://app-oauth
+        predicates:
+        - Path=/api/security/**
+        filters:
+        - StripPrefix=2 
+      - id: app-user
+        uri: lb://app-user
+        predicates:
+        - Path=/api/user/**
+        filters:
+        - StripPrefix=2 
+        
+          
+          

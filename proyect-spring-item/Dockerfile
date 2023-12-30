@@ -1,0 +1,4 @@
+FROM openjdk:11-jre-slim-buster
+VOLUME /tmp
+ADD ./target/proyect-spring-item-0.0.1-SNAPSHOT.jar item-server.jar
+ENTRYPOINT ["java","-jar","/item-server.jar" ]

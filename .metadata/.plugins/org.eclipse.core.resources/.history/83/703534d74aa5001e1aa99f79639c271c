@@ -1,0 +1,30 @@
+spring.application.name=app-zuul-server
+server.port=8090
+
+#EUREKA
+#eureka.instance.instance-id=${spring.application.name}:${spring.application.instance_id:${random.value}}
+eureka.client.serviceUrl.defaultZone=http://servicio-eureka-server:8761/eureka
+
+#ZUUL
+zuul.routes.item.service-id=app-item
+zuul.routes.item.path=/api/item/**
+
+zuul.routes.product.service-id=app-product
+zuul.routes.product.path=/api/product/**
+
+zuul.routes.user.service-id=app-user
+zuul.routes.user.path=/api/user/**
+
+zuul.routes.security.service-id=app-oauth
+zuul.routes.security.path=/api/security/**
+zuul.routes.security.sensitive-headers=Cookie,Set-Cookie
+#CONFIG TIMEOUT
+hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds: 20000
+ribbon.ConnectTimeout: 3000
+ribbon.ReadTimeout: 10000
+
+
+!SLEUTH
+spring.sleuth.sampler.probability=1.0
+!spring.zipkin.base-url=http://localhost:9411/
+!spring.zipkin.sender.type=rabbit

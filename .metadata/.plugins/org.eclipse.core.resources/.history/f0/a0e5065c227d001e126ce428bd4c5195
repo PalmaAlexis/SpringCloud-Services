@@ -1,0 +1,129 @@
+package com.alumn.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+//import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alumn.model.Item;
+import com.commons1.model.Product;
+import com.alumn.service.IItemService;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+//import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+
+@RestController
+@RefreshScope
+public class ItemController {
+
+	@Autowired
+	private Environment env;
+	
+	@Value("${config.text}")
+	private String text;
+	
+	@Autowired
+	@Qualifier("serviceRestTemplate")//serviceFeign
+	private IItemService service;
+
+	@SuppressWarnings("rawtypes")
+	@Autowired
+	private CircuitBreakerFactory cbFactory;
+
+	@GetMapping("/allItems")
+	public List<Item> allItems(@RequestParam(name = "nombre", required = false) String name,
+			@RequestHeader(name = "token2", required = false) String token) {
+		return service.findAll();
+	}
+
+	// @HystrixCommand(fallbackMethod = "getItemByIdFB")
+	@GetMapping("/id/{id}/quantity/{quantity}")
+	public Item getItemById(@PathVariable Long id, @PathVariable Integer quantity) {
+		return service.findById(id, quantity);
+	}
+
+	@GetMapping("/id2/{id}/quantity/{quantity}")
+	public Item getItemById2(@PathVariable Long id, @PathVariable Integer quantity) {
+		// return service.findById(id, quantity);
+		return cbFactory.create("items").run(() -> service.findById(id, quantity), e -> getItemByIdFB(id, quantity, e));
+	}
+
+	@CircuitBreaker(name = "items", fallbackMethod = "getItemByIdFB2")
+	@TimeLimiter(name = "items") //aunque items no tenga un fallback method, el otro debera tener el completableFuture  //es decri el del circuitBreaker debe tener un completableFuture
+	@GetMapping("id3/{id}/quantity/{quantity}")
+	public CompletableFuture<Item> getItemById3(@PathVariable Long id, @PathVariable Integer quantity) {
+		// return service.findById(id, quantity);
+		return CompletableFuture.supplyAsync(()-> service.findById(id, quantity) );
+	}
+
+	public Item getItemByIdFB(Long id, Integer quantity, Throwable e) {
+		Product p = new Product();
+		p.setId(id);
+		p.setName("Camera back");
+		return new Item(p, quantity);
+	}
+
+	public CompletableFuture<Item> getItemByIdFB2(Long id, Integer quantity, Throwable e) {
+		Product p = new Product();
+		p.setId(id);
+		p.setName("Camera back");
+		return CompletableFuture.supplyAsync(() -> {
+			return new Item(p, quantity);
+		});
+	}
+	
+	@GetMapping("/obtener-config")
+	public ResponseEntity<?> obtenerConfig(@Value ("${server.port}") String port){
+		Map<String, String> json= new HashMap<>();
+		json.put("puerto", port);
+		json.put("text", text);
+		
+		if(env.getActiveProfiles().length>0 && env.getActiveProfiles()[0].equals("dev")) {
+			json.put("user", env.getProperty("config.user"));
+			json.put("email", env.getProperty("config.email"));
+		}		
+		return new ResponseEntity<Map<String, String>>(json, HttpStatus.OK);
+	}
+
+	// HYSTRIX hace que se mande a otro metodo cuando hay un error en el metodo por
+	// defecto de un endpoint del controlador cliente
+	
+	@PostMapping("/create")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Product createProduct(@RequestBody Product p) {
+		return service.createProduct(p);
+	}
+	
+	@PutMapping("/edit/{id}")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Product editProduct(@RequestBody Product p, @PathVariable Long id) {
+		return service.editProduct(p, id);
+	}
+	
+	@DeleteMapping("/delete/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteProduct(@PathVariable Long id) {
+		service.deleteProduct(id);
+	}
+}

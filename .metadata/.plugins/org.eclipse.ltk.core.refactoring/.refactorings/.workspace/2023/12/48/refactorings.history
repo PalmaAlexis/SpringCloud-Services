@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;proyect-spring-oauth&apos;" deleteContents="true" description="Delete resource &apos;proyect-spring-oauth&apos;" element1="/proyect-spring-oauth" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1701469050879"/>&#x0A;<refactoring comment="Delete resource &apos;oauth1&apos;" deleteContents="false" description="Delete resource &apos;oauth1&apos;" element1="/oauth1" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1701554528219"/>
+</session>

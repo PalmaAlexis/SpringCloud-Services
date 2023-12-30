@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Encapsulate field &apos;com.usercommons.model.entity.User.attempts&apos; in &apos;com.usercommons.model.entity.User&apos;&#x0A;- Original project: &apos;proyect-spring-user-commons&apos;&#x0A;- Original element: &apos;com.usercommons.model.entity.User.attempts&apos;&#x0A;- Getter method name: &apos;getAttempts&apos;&#x0A;- Setter method name: &apos;setAttempts&apos;&#x0A;- Field visibility: &apos;public&apos;&#x0A;- Use getter and setter methods in declaring type" comments="false" declaring="true" description="Encapsulate field &apos;attempts&apos;" flags="589830" getter="getAttempts" id="org.eclipse.jdt.ui.self.encapsulate" input="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.usercommons.model.entity{User.java[User^attempts" insertion="15" setter="setAttempts" stamp="1701751281984" version="1.0" visibility="1"/>
+</session>

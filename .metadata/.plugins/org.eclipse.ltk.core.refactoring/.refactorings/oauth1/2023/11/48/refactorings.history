@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring accessors="true" comment="Delete element from project &apos;oauth1&apos;&#x0A;- Original project: &apos;oauth1&apos;&#x0A;- Original element: &apos;oauth1/src/main/java/com.oauth1.client&apos;" description="Delete element" element1="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.oauth1.client" elements="1" flags="589830" id="org.eclipse.jdt.ui.delete" resources="0" stamp="1701137984700" subPackages="false" version="1.0"/>
+</session>

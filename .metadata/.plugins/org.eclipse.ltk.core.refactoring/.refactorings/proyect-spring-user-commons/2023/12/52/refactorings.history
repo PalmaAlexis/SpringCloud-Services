@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring accessors="true" comment="Delete 2 elements from project &apos;proyect-spring-user-commons&apos;&#x0A;- Original project: &apos;proyect-spring-user-commons&apos;&#x0A;- Original elements:&#x0A;     proyect-spring-user-commons/target/generated-sources/annotations&#x0A;     proyect-spring-user-commons/target/generated-test-sources/test-annotations" description="Delete elements" element1="/target\/generated-test-sources\/test-annotations=/ignore_optional_problems=/true=/=/test=/true=/=/optional=/true=/=/maven.pomderived=/true=/=/m2e-apt=/true=/" element2="/target\/generated-sources\/annotations=/ignore_optional_problems=/true=/=/optional=/true=/=/maven.pomderived=/true=/=/m2e-apt=/true=/" elements="2" flags="589830" id="org.eclipse.jdt.ui.delete" resources="0" stamp="1703812091775" subPackages="false" version="1.0"/>
+</session>
