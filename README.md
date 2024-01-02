@@ -28,5 +28,8 @@
 • Then, I added **Sleuth and Zipkin**, respectively, for monitoring the consults I made to my application, simulating 
   different cases and information into my application.
 
+• Finally, I used **Docker and Docker-compose** for running my microservices-app independently, in my computer, 
+  using images from Docker- hub (openJDK, RabbitMQ, mySQL, PostgreSQL, Zipkin) and building/running the containers.
+
 
 
